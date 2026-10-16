@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peer Benchmarks – Duo License Utilization (Sample Data Mock-Up)</title>
+<style>
+:root{
+  --bg:#0b0a1f; --bg2:#1a0b2e; --card:#14122b; --card-b:#2a2750; --text:#eef0ff; --muted:#a3a6c8;
+  --peer:#6f9bff; --you:#3d4dff; --you2:#7a1fe0; --accent:#4da3ff; --warn:#ffb84d; --bad:#ff6b6b; --good:#4ade9a;
+  --chip:#1f1c40; --banner-bg:#3a2a00; --banner-t:#ffd98a; --shadow:rgba(0,0,0,.35);
+  color-scheme: dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f4fb; --bg2:#ece6f7; --card:#ffffff; --card-b:#d9dcf0; --text:#17183a; --muted:#585b82;
+    --peer:#6f9bff; --you:#2f3fe0; --you2:#6a17c9; --accent:#1665d8; --warn:#9a5b00; --bad:#c62828; --good:#0f7a4a;
+    --chip:#eceefb; --banner-bg:#fff4d6; --banner-t:#5c3d00; --shadow:rgba(20,20,60,.12);
+    color-scheme: light;
+  }
+}
+:root[data-theme="dark"]{ color-scheme: dark; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--text);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;line-height:1.5;min-height:100vh}
+.sample-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--banner-bg);color:var(--banner-t);
+  padding:8px 16px;font-size:13px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--warn)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--banner-bg);z-index:21}
+.badge{font-weight:700;background:var(--warn);color:#201400;padding:2px 10px;border-radius:999px;white-space:nowrap}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:24px;margin:4px 0 2px}
+h2{font-size:16px;margin:0 0 10px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.toggle{display:inline-flex;border:1px solid var(--card-b);border-radius:10px;overflow:hidden;background:var(--card)}
+.toggle button{background:none;border:0;color:var(--muted);padding:10px 16px;font:inherit;font-size:14px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--you);color:#fff;font-weight:600}
+button:focus-visible,select:focus-visible,summary:focus-visible,tr[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;padding:18px;box-shadow:0 2px 10px var(--shadow)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.ctx{margin-top:14px}
+.ctx dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 20px;margin:0}
+.ctx dt{font-size:12px;color:var(--muted)}
+.ctx dd{margin:0;font-weight:600;font-size:15px}
+select{background:var(--chip);color:var(--text);border:1px solid var(--card-b);border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;max-width:100%}
+.chip{display:inline-block;background:var(--chip);border:1px solid var(--card-b);border-radius:999px;padding:3px 10px;font-size:12px}
+.chip.fb{border-color:var(--warn);color:var(--warn)}
+.banner{border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px;border:1px solid var(--warn);background:var(--banner-bg);color:var(--banner-t)}
+.banner.info{background:var(--chip);color:var(--text);border-color:var(--accent)}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+svg text{fill:var(--muted);font-size:12px;font-family:inherit}
+svg .val{fill:var(--text);font-weight:600;font-size:13px}
+.strip{margin-top:18px}
+.strip p{margin:0 0 6px;font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--card-b)}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.feat{cursor:pointer}
+tr.feat:hover{background:var(--chip)}
+tr.detail td{background:var(--chip);font-size:13px;color:var(--muted)}
+.neg{color:var(--bad);font-weight:600}
+.gaps{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.gaps li{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--card-b);border-radius:10px;font-size:14px}
+.gaps .tag{flex:none;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;margin-top:1px}
+.tag.hit{background:var(--bad);color:#fff}
+.tag.ok{background:var(--good);color:#04210f}
+.tag.chk{background:var(--warn);color:#201400}
+.gaps small{display:block;color:var(--muted)}
+.posture{font-weight:700;margin:0 0 10px}
+.actions{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.actions li{padding:10px;border:1px solid var(--card-b);border-radius:10px;font-size:14px}
+.actions small{display:block;color:var(--muted);margin-top:2px}
+.btn{background:var(--you);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;font-size:14px;cursor:pointer;margin-top:12px}
+.btn:hover{filter:brightness(1.1)}
+.tt{position:fixed;pointer-events:none;background:#000;color:#fff;padding:6px 9px;border-radius:6px;font-size:12px;z-index:50;display:none;max-width:220px}
+footer{margin-top:22px;font-size:13px;color:var(--muted)}
+.disclaimer{margin-top:14px;font-size:13px;border:1px dashed var(--warn);border-radius:10px;padding:10px 14px;color:var(--text)}
+.demo{margin-left:auto}
+.demo label{font-size:13px;color:var(--muted);margin-right:6px}
+@media (prefers-reduced-motion:no-preference){ .bar{transition:height .4s,y .4s} }
+</style>
+</head>
+<body>
+<div class="sample-bar" role="note">
+  <span><span class="badge">Sample Data</span> All names, IDs, seat counts, percentages, and dollars on this page are invented for illustration.</span>
+  <span>Not actual requirements.</span>
+</div>
+
+<main>
+  <h1>Peer Benchmarks: Duo license utilization</h1>
+  <p class="sub">How does this customer's use of the Duo seats it bought compare with similar customers?</p>
+
+  <div class="row">
+    <div class="toggle" role="group" aria-label="Choose a view">
+      <button id="vCS" aria-pressed="true">Customer Success: by ARR</button>
+      <button id="vRN" aria-pressed="false">Renewals: by ATR</button>
+    </div>
+    <div class="demo">
+      <label for="state">Demo state</label>
+      <select id="state">
+        <option value="normal">Normal</option>
+        <option value="notel">No telemetry</option>
+        <option value="small">Cohort under 10 accounts</option>
+        <option value="stale">Peer data out of date</option>
+      </select>
+    </div>
+  </div>
+
+  <section class="card ctx" aria-label="Customer context">
+    <dl id="ctx"></dl>
+  </section>
+
+  <div id="banners"></div>
+
+  <div class="grid">
+    <section class="card full" aria-labelledby="cohortH">
+      <h2 id="cohortH">Your peer group</h2>
+      <div class="row">
+        <span id="cohortText"></span>
+        <label for="cohortSel" class="sub" style="margin:0">Change group</label>
+        <select id="cohortSel"></select>
+        <span id="fbChip"></span>
+      </div>
+    </section>
+
+    <section class="card" id="chartCard" aria-labelledby="chartH">
+      <h2 id="chartH">License utilization: peers vs. you</h2>
+      <div id="chart"></div>
+      <div class="legend"><span><i style="background:var(--peer)"></i>Peer median (P50)</span><span><i style="background:var(--you)"></i>You</span></div>
+      <div class="strip" id="strip"></div>
+    </section>
+
+    <section class="card" id="featCard" aria-labelledby="featH">
+      <h2 id="featH">Feature adoption: you vs. peers</h2>
+      <table>
+        <thead><tr><th>Feature</th><th class="n">You</th><th class="n">Peer P50</th><th class="n">Gap</th></tr></thead>
+        <tbody id="feat"></tbody>
+      </table>
+      <p class="sub" style="margin:10px 0 0;font-size:12px">Select a row to see how much the feature is used and which license it needs.</p>
+    </section>
+
+    <section class="card" id="gapCard" aria-labelledby="gapH">
+      <h2 id="gapH">Why is there a gap?</h2>
+      <ul class="gaps" id="gaps"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="actH">
+      <h2 id="actH">Recommended actions</h2>
+      <div id="posture"></div>
+      <ul class="actions" id="actions"></ul>
+      <button class="btn" id="copy">Copy talk track</button>
+      <span id="copied" class="sub" style="margin-left:10px" aria-live="polite"></span>
+    </section>
+  </div>
+
+  <footer>
+    Peer data is combined across customers. Groups with fewer than 10 accounts are merged into a broader group, so no single customer can be identified.
+  </footer>
+  <div class="disclaimer"><strong>Sample Data notice:</strong> This mock-up shows layout, behavior, and wording only. Figures, thresholds, segment bands, and the utilization formula are placeholders and must not be used in place of actual requirements. Items still to confirm: ATR dollar bands, the utilization formula, and the pilot product.</div>
+</main>
+<div class="tt" id="tt"></div>
+
+<script>
+/* ---------- Sample Data (all values invented) ---------- */
+const D = {
+  customer:{name:"Acme Corp", cavBu:"1234567", deployment:"DUO-0042", stage:"Use / Engage and Adopt",
+    purchased:5000, enrolled:3100, active30:2400, deployedMonths:14, tier:"Duo Advantage",
+    renewal:"2026-12-15", atr:410000, atrTier:"Select", arrBand:"Medium ($2M–$6M ARR)"},
+  cohorts:{
+    CS:[
+      {id:"cs1", label:"Medium ARR band, Duo customers with telemetry", n:212, p:[55,71,84,92], fallback:false},
+      {id:"cs2", label:"Medium ARR band, Manufacturing only", n:38, p:[57,73,85,93], fallback:false},
+      {id:"cs3", label:"All Enterprise Duo customers (broader group)", n:1240, p:[53,69,83,91], fallback:true}
+    ],
+    RN:[
+      {id:"rn1", label:"Select tier, Duo customers with telemetry", n:176, p:[52,69,82,91], fallback:false},
+      {id:"rn2", label:"Select tier, renewing within 90 days", n:44, p:[50,67,80,90], fallback:false},
+      {id:"rn3", label:"All Duo renewals (broader group)", n:1240, p:[53,69,83,91], fallback:true}
+    ]},
+  features:[
+    {name:"Verified Push", you:41, peer:68, eng:"Medium", lic:"Essentials", note:"Sign-in approvals that show a code to match."},
+    {name:"Platform / Roaming authenticators", you:6, peer:18, eng:"Low", lic:"Essentials / Advantage", note:"Passkeys and security keys (FIDO2)."},
+    {name:"Duo Desktop (device health)", you:22, peer:47, eng:"Low", lic:"Essentials", note:"Checks that a device meets rules before sign-in."},
+    {name:"Trusted Endpoints", you:10, peer:31, eng:"Low", lic:"Essentials", note:"Only recognized devices can sign in."}
+  ]
+};
+
+let view="CS", state="normal", cohortId=null;
+const $=id=>document.getElementById(id);
+const pct=(a,b)=>Math.round(a/b*100);
+const money=v=>"$"+Math.round(v/1000)+"K";
+
+function daysToRenewal(){ return Math.round((new Date(D.customer.renewal)-new Date("2026-10-16"))/86400000); }
+
+function percentile(v,p){ // simple estimate between the known points; Sample Data only
+  const pts=[[0,0],[p[0],25],[p[1],50],[p[2],75],[p[3],90],[100,100]];
+  for(let i=1;i<pts.length;i++){ if(v<=pts[i][0]){ const [x0,y0]=pts[i-1],[x1,y1]=pts[i]; return Math.round(y0+(y1-y0)*(v-x0)/((x1-x0)||1)); } }
+  return 99;
+}
+
+function currentCohort(){
+  const list=D.cohorts[view==="CS"?"CS":"RN"];
+  let c=list.find(x=>x.id===cohortId)||list[0];
+  if(state==="small"){ c={...list[0], label:list[2].label, n:list[2].n, p:list[2].p, fallback:true, requested:list[0].label, requestedN:7}; }
+  return c;
+}
+
+function renderCtx(){
+  const c=D.customer, rows=[
+    ["Customer",c.name],["CAV BU ID",c.cavBu],["Deployment ID",c.deployment],
+    ["Product","Cisco Duo ("+c.tier+")"],["Customer journey stage",c.stage]];
+  if(view==="CS") rows.push(["ARR band",c.arrBand]);
+  else rows.push(["ATR tier",c.atrTier+" (Sales segment)"],["Renewal date",c.renewal+" ("+daysToRenewal()+" days)"],["ATR",money(c.atr)+" (Sample Data)"]);
+  $("ctx").innerHTML=rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join("");
+}
+
+function renderBanners(){
+  const b=[], c=currentCohort();
+  if(state==="small") b.push(`<div class="banner">Broader group used. Your requested group (${c.requested}) has only ${c.requestedN} accounts, below the minimum of 10, so peers are shown for the parent tier.</div>`);
+  if(state==="stale") b.push(`<div class="banner">Peer data was last updated 9 days ago. Values may not reflect current peer performance.</div>`);
+  if(state==="notel") b.push(`<div class="banner info">Usage data is not available for this customer. Utilization cannot be compared with peers until telemetry sharing is turned on.</div>`);
+  $("banners").innerHTML=b.join("");
+}
+
+function renderCohort(){
+  const list=D.cohorts[view==="CS"?"CS":"RN"], c=currentCohort();
+  $("cohortText").innerHTML=`Compared with <strong>${c.n.toLocaleString()}</strong> accounts: ${c.label}.`;
+  const sel=$("cohortSel");
+  sel.innerHTML=list.map(x=>`<option value="${x.id}" ${x.id===(cohortId||list[0].id)?"selected":""}>${x.label}</option>`).join("");
+  sel.disabled = state==="small";
+  $("fbChip").innerHTML=c.fallback?`<span class="chip fb">Fallback: broader group</span>`:"";
+}
+
+function bar(x,val,color,label,tip){
+  const H=190, top=20, h=H*val/100, y=top+H-h;
+  return `<rect class="bar" data-tip="${tip}" x="${x}" y="${y}" width="90" height="${h}" rx="6" fill="${color}"/>
+          <text class="val" x="${x+45}" y="${y-6}" text-anchor="middle">${val}%</text>
+          <text x="${x+45}" y="${top+H+18}" text-anchor="middle">${label}</text>`;
+}
+
+function renderChart(){
+  const off = state==="notel";
+  $("chartCard").style.display = off?"none":"";
+  $("featCard").style.display = off?"none":"";
+  if(off) return;
+  const c=currentCohort(), you=pct(D.customer.active30,D.customer.purchased);
+  let grid="";
+  [0,25,50,75,100].forEach(g=>{const y=20+190-190*g/100; grid+=`<line x1="40" x2="380" y1="${y}" y2="${y}" stroke="var(--card-b)" stroke-dasharray="3 4"/><text x="34" y="${y+4}" text-anchor="end">${g}%</text>`;});
+  $("chart").innerHTML=`<svg viewBox="0 0 400 240" width="100%" role="img" aria-label="Bar chart: peer median ${c.p[1]} percent, you ${you} percent">
+    ${grid}
+    ${bar(80,c.p[1],"var(--peer)","Peers (median)",`Peer median: ${c.p[1]}%. Sample size: ${c.n} accounts`)}
+    ${bar(220,you,"var(--you)","You",`${D.customer.name}: ${you}% (${D.customer.active30.toLocaleString()} of ${D.customer.purchased.toLocaleString()} seats active in last 30 days)`)}
+  </svg>`;
+  const pr=percentile(you,c.p), max=100;
+  const pos=v=>`${v/max*100}%`;
+  $("strip").innerHTML=`<p>Peer range. You are at about the <strong>${ordinal(pr)} percentile</strong>${you<c.p[0]?" (below the 25th percentile of peers)":""}.</p>
+    <svg viewBox="0 0 400 64" width="100%" role="img" aria-label="Peer range strip">
+      <rect x="20" y="26" width="360" height="10" rx="5" fill="var(--chip)" stroke="var(--card-b)"/>
+      <rect x="${20+3.6*c.p[0]}" y="26" width="${3.6*(c.p[3]-c.p[0])}" height="10" fill="var(--peer)" opacity=".45" data-tip="Middle of the peer range: ${c.p[0]}% to ${c.p[3]}%"/>
+      ${c.p.map((v,i)=>`<line x1="${20+3.6*v}" x2="${20+3.6*v}" y1="20" y2="42" stroke="var(--peer)" stroke-width="2"/><text x="${20+3.6*v}" y="58" text-anchor="middle">${["P25","P50","P75","P90"][i]} ${v}%</text>`).join("")}
+      <g data-tip="You: ${you}% (${ordinal(pr)} percentile)"><polygon points="${20+3.6*you-7},4 ${20+3.6*you+7},4 ${20+3.6*you},18" fill="var(--you)"/>
+      <text class="val" x="${20+3.6*you}" y="2" text-anchor="middle" style="font-size:11px">You ${you}%</text></g>
+    </svg>`;
+  bindTips();
+}
+function ordinal(n){const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+
+function renderFeat(){
+  $("feat").innerHTML=D.features.map((f,i)=>{
+    const gap=f.you-f.peer;
+    return `<tr class="feat" tabindex="0" data-i="${i}" aria-expanded="false"><td>${f.name}</td><td class="n">${f.you}%</td><td class="n">${f.peer}%</td><td class="n neg">${gap} pts</td></tr>
+    <tr class="detail" id="d${i}" hidden><td colspan="4">${f.note} Engagement level: <strong>${f.eng}</strong>. License needed: ${f.lic}.</td></tr>`;
+  }).join("");
+  document.querySelectorAll("tr.feat").forEach(r=>{
+    const t=()=>{const d=$("d"+r.dataset.i);d.hidden=!d.hidden;r.setAttribute("aria-expanded",!d.hidden);};
+    r.onclick=t; r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();t();}};
+  });
+}
+
+function renderGaps(){
+  const c=D.customer, enr=pct(c.enrolled,c.purchased), act=pct(c.active30,c.enrolled);
+  if(state==="notel"){
+    $("gapCard").querySelector("h2").textContent="What we can say without usage data";
+    $("gaps").innerHTML=`<li><span class="tag chk">Check</span><div>Purchased seats: ${c.purchased.toLocaleString()} (${c.tier}).<small>No usage numbers are shown, and none are scored as 0%.</small></div></li>
+    <li><span class="tag chk">Check</span><div>Features included in the license cannot be confirmed as set up.<small>Ask the customer to share a settings export, or turn on telemetry sharing.</small></div></li>`;
+    return;
+  }
+  $("gapCard").querySelector("h2").textContent="Why is there a gap?";
+  const g=[
+    [enr<70?"hit":"ok","Seats bought but users not enrolled",`${c.enrolled.toLocaleString()} of ${c.purchased.toLocaleString()} seats enrolled (${enr}%). Rule: flag below 70%.`],
+    [act<60?"hit":"ok","Enrolled users rarely sign in",`${c.active30.toLocaleString()} of ${c.enrolled.toLocaleString()} enrolled users active in 30 days (${act}%). Rule: flag below 60%.`],
+    ["hit","Features licensed but not set up","Duo Desktop 22% and Trusted Endpoints 10%, against peer medians of 47% and 31%."],
+    [c.deployedMonths<6?"hit":"ok","Early in the deployment",`Deployed ${c.deployedMonths} months ago. Rule: flag under 6 months (gap may close on its own).`],
+    ["chk","Seat count may be too high","Needs a check with the customer: headcount change, merger, or over-purchase."],
+    ["chk","Applications not yet protected","Needs a check: list of applications behind Duo versus the customer's application inventory."]
+  ];
+  const label={hit:"Likely",ok:"Not a cause",chk:"Check"};
+  $("gaps").innerHTML=g.map(x=>`<li><span class="tag ${x[0]}">${label[x[0]]}</span><div>${x[1]}<small>${x[2]}</small></div></li>`).join("");
+}
+
+function renderActions(){
+  const d=daysToRenewal(), atr=money(D.customer.atr), notel=state==="notel";
+  let acts;
+  if(notel){
+    acts=[["Enable Duo telemetry sharing","Owner: Customer Success Specialist. This week. Without it, peer comparison is not possible."],
+          ["Confirm seats purchased vs. seats in use with the customer","Owner: Customer Success Specialist. Within 2 weeks."]];
+  } else if(view==="CS"){
+    acts=[["Run an enrollment campaign with the customer's identity team","Stage: Onboard / Adopt. Owner: Customer Success Specialist. Start within 2 weeks."],
+          ["Hold a policy workshop to turn on Duo Desktop and Trusted Endpoints","Stage: Optimize. Owner: Customer Success Specialist with customer security lead. Within 30 days."],
+          ["Find applications not yet protected by Duo","Stage: Adopt. Owner: Customer Success Specialist. Within 30 days."],
+          ["Confirm the real user count before renewal talks","Stage: Renew. Owner: Customer Success Executive. Within 45 days."]];
+  } else {
+    acts=[["Bring Customer Success in on the adoption plan now","Owner: Renewals Manager. This week."],
+          ["Confirm real user count so seats are right-sized fairly","Owner: Renewals Specialist. Within 3 weeks."],
+          ["Share the peer comparison in the renewal conversation","Owner: Renewals Manager. 30 days before renewal."]];
+  }
+  $("posture").innerHTML = view==="RN" && !notel
+    ? `<p class="posture">Renewal posture: Drive adoption first. ${d} days to renewal, ${atr} ATR at risk (Sample Data).</p>`
+    : (view==="CS" && !notel ? `<p class="posture">Intervention needed: below the peer 25th percentile with renewal ${d} days away.</p>` : "");
+  $("actions").innerHTML=acts.map(a=>`<li>${a[0]}<small>${a[1]}</small></li>`).join("");
+}
+
+function talkTrack(){
+  const c=currentCohort(), you=pct(D.customer.active30,D.customer.purchased);
+  if(state==="notel") return "We cannot show how your Duo use compares with peers yet because usage data is not being shared. Turning on telemetry sharing takes a short change and lets us show you where you stand.";
+  return `Today ${you}% of your Duo seats are active, compared with a peer median of ${c.p[1]}%. Most of the gap comes from users who are not yet enrolled. Enrolling them and turning on device checks would move you toward the peer median before your ${D.customer.renewal} renewal. (Sample Data)`;
+}
+
+function bindTips(){
+  const tt=$("tt");
+  document.querySelectorAll("[data-tip]").forEach(el=>{
+    el.onmousemove=e=>{tt.textContent=el.dataset.tip;tt.style.display="block";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";};
+    el.onmouseleave=()=>tt.style.display="none";
+  });
+}
+
+function render(){
+  renderCtx(); renderBanners(); renderCohort(); renderChart(); renderFeat(); renderGaps(); renderActions(); bindTips();
+}
+
+$("vCS").onclick=()=>{view="CS";cohortId=null;$("vCS").setAttribute("aria-pressed","true");$("vRN").setAttribute("aria-pressed","false");render();};
+$("vRN").onclick=()=>{view="RN";cohortId=null;$("vRN").setAttribute("aria-pressed","true");$("vCS").setAttribute("aria-pressed","false");render();};
+$("state").onchange=e=>{state=e.target.value;render();};
+$("cohortSel").onchange=e=>{cohortId=e.target.value;render();};
+$("copy").onclick=async()=>{
+  const t=talkTrack();
+  try{ await navigator.clipboard.writeText(t); $("copied").textContent="Copied"; }
+  catch(e){ $("copied").textContent="Select and copy: "+t; }
+  setTimeout(()=>{$("copied").textContent="";},4000);
+};
+render();
+</script>
+</body>
+</html>
